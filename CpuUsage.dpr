@@ -1,4 +1,4 @@
-program CpuUsage;
+﻿program CpuUsage;
 
 {$APPTYPE CONSOLE}
 

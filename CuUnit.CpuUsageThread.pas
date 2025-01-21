@@ -1,4 +1,4 @@
-unit CuUnit.CpuUsageThread;
+﻿unit CuUnit.CpuUsageThread;
 
 interface
 
