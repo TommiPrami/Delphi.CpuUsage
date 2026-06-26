@@ -27,8 +27,7 @@ type
     procedure Unlock;
     procedure TerminateAndWaitFor;
   public
-    constructor Create(CreateSuspended: Boolean); reintroduce;  overload;
-    constructor Create(const AUpdaterInterval: Integer = DEFAULT_UPDATE_INTERVAL); overload;
+    constructor Create(const AUpdaterInterval: Integer = DEFAULT_UPDATE_INTERVAL); reintroduce;
     destructor Destroy; override;
 
     property TotalCpuUsage: Double read GetTotalCpuUsage;
@@ -37,7 +36,7 @@ type
 implementation
 
 uses
-  System.Math;
+  System.SysUtils;
 
 { TCpuUsage }
 
@@ -69,26 +68,19 @@ end;
 
 constructor TCpuUsage.Create(const AUpdaterInterval: Integer);
 begin
+  if AUpdaterInterval <= 0 then
+    raise EArgumentOutOfRangeException.CreateFmt('Updater interval must be positive, got %d', [AUpdaterInterval]);
+
   FCriticalSection := TCriticalSection.Create;
   FUpdaterIntervalMSec := AUpdaterInterval;
   FEvent := TSimpleEvent.Create;
 
-  // One call needed to initialize
+  // Seed the baseline times only; a delta sampled over the few microseconds
+  // since seeding would be meaningless, so the first real value is calculated
+  // by the thread after one full interval
   CalculateTotalCpuUsage;
 
-  Lock;
-  try
-    FTotalCpuUsage := CalculateTotalCpuUsage;
-  finally
-    Unlock;
-  end;
-
   inherited Create(False);
-end;
-
-constructor TCpuUsage.Create(CreateSuspended: Boolean);
-begin
-  Create(DEFAULT_UPDATE_INTERVAL);
 end;
 
 destructor TCpuUsage.Destroy;
@@ -117,8 +109,6 @@ begin
       finally
         Unlock;
       end;
-
-      FEvent.ResetEvent;
     end;
   end;
 end;
@@ -145,6 +135,11 @@ end;
 
 procedure TCpuUsage.TerminateAndWaitFor;
 begin
+  // If the constructor raised before the thread was created, there is nothing
+  // to wake up or wait for
+  if ThreadID = 0 then
+    Exit;
+
   Terminate;
 
   FEvent.SetEvent;

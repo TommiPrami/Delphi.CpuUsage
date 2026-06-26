@@ -15,7 +15,7 @@ var
   LCpuUsage: TCpuUsage;
   LWatch: TStopwatch;
 begin
-  var LCurrentCpuUsage: Double := 0.00;
+  var LCurrentCpuUsage: Double;
   var LPreviousCpuUsage : Double := 0.00;
   var LUpdateCounter: Integer := 0;
 
@@ -31,7 +31,7 @@ begin
 
         if (Abs(LCurrentCpuUsage - LPreviousCpuUsage) > 0.01) or (LWatch.Elapsed.TotalMilliseconds >= UPDATE_INTERVAL) then
         begin
-          WriteLn('CPU USage: ' + FormatFloat('0.00', LCurrentCpuUsage) + '%');
+          WriteLn('CPU Usage: ' + FormatFloat('0.00', LCurrentCpuUsage) + '%');
           LPreviousCpuUsage := LCurrentCpuUsage;
 
           Inc(LUpdateCounter);

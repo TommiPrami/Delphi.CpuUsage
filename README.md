@@ -1,8 +1,8 @@
 ## Delphi.CpuUsage
 
-Simple class inherited from TTHread, that will get Total CPU usage (as persentage).
+Simple class inherited from TThread, that will get Total CPU usage (as percentage).
 
-If someone wants new features and/or find room for improvement (must be :D ), jsut throw me an pull reguest.
+If someone wants new features and/or finds room for improvement (must be :D ), just throw me a pull request.
 
 ### Ideas/TODO
  - Add event when new CPU usage value after has been calculated
